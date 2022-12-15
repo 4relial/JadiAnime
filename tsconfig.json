@@ -6,15 +6,13 @@
       "strict": true,
       "lib": [
           "ES2021",
-      ]
+      ],
+      "declaration": true,
+    "outDir": "./lib",
   },
   "ts-node": {
       "files": true
   },
-  "include": [
-      "./*.ts"
-  ],
-  "exclude": [
-      "./node_modules"
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules", "**/__tests__/*"]
 }
