@@ -7,6 +7,10 @@
     "scripts": {
         "build": "npx tsc"
     },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/4relial/JadiAnime.git"
+      },
     "keywords": [],
     "author": "",
     "license": "ISC",
