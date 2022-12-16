@@ -24,10 +24,10 @@ export const JadiAnime = async (img: string, opts: opts) => {
 
     let httpsAgent: HttpsProxyAgent | SocksProxyAgent | undefined;
 
-    if(opts?.proxyType == "socks5"){
+    if(opts?.proxyType?.toLowerCase() == "socks5"){
         httpsAgent = new SocksProxyAgent(opts?.proxyUrl ? opts.proxyUrl : "");
         httpsAgent.timeout = 30000;
-    } else if(opts?.proxyType == "https"){
+    } else if(opts?.proxyType?.toLowerCase() == "https"){
         httpsAgent = new HttpsProxyAgent(opts?.proxyUrl ? opts.proxyUrl : "");
         httpsAgent.timeout = 30000;
     }
@@ -111,7 +111,7 @@ export const JadiAnime = async (img: string, opts: opts) => {
             },
             {
                 onRetry(e: { toString: () => any; }, attempt: any) {
-                    console.error(`QQ file upload error caught (attempt #${attempt}): ${e.toString()}`);
+                    console.error(`Upload Gagal (Percobaan ke #${attempt}): ${e.toString()}`);
                 },
                 retries: 100,
                 factor: 1,
