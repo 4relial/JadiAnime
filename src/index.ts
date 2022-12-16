@@ -3,6 +3,8 @@ import { v4 as v4uuid } from 'uuid';
 import axios from 'axios';
 import asyncRetry from 'async-retry';
 import { base64 } from './base64';
+import { HttpsProxyAgent } from 'https-proxy-agent';
+import { SocksProxyAgent } from 'socks-proxy-agent';
 
 const signV1 = (obj: Record<string, unknown>) => {
     const str = JSON.stringify(obj);
@@ -13,7 +15,23 @@ const signV1 = (obj: Record<string, unknown>) => {
     );
 };
 
-export const JadiAnime = async (img: string) => {
+type opts = {
+    proxyType ? : string;
+    proxyUrl ? : string;
+  }
+
+export const JadiAnime = async (img: string, opts: opts) => {
+
+    let httpsAgent: HttpsProxyAgent | SocksProxyAgent | undefined;
+
+    if(opts?.proxyType == "socks5"){
+        httpsAgent = new SocksProxyAgent(opts?.proxyUrl ? opts.proxyUrl : "");
+        httpsAgent.timeout = 30000;
+    } else if(opts?.proxyType == "https"){
+        httpsAgent = new HttpsProxyAgent(opts?.proxyUrl ? opts.proxyUrl : "");
+        httpsAgent.timeout = 30000;
+    }
+
     const imgData = await base64(img)
     const obj = {
         busiId: 'different_dimension_me_img_entry',
@@ -34,11 +52,12 @@ export const JadiAnime = async (img: string) => {
     let extra;
     try {
         extra = await asyncRetry(
-            async (bail: (arg0: Error) => void) => {
+            async (bail) => {
                 const response = await axios.request({
                     method: 'POST',
                     url: 'https://ai.tu.qq.com/trpc.shadow_cv.ai_processor_cgi.AIProcessorCgi/Process',
                     data: obj,
+                    httpsAgent,
                     headers: {
                         'Content-Type': 'application/json',
                         'Origin': 'https://h5.tu.qq.com',
@@ -58,21 +77,21 @@ export const JadiAnime = async (img: string) => {
                 }
 
                 if (data.msg === 'VOLUMN_LIMIT') {
-                    throw new Error('QQ rate limit caught');
+                    throw new Error('Server Sedang Sibuk');
                 }
 
                 if (data.msg === 'IMG_ILLEGAL') {
-                    bail(new Error('Couldn\'t pass the censorship. Try another photo.'));
+                    bail(new Error('Gambar ini melanggar aturan!'));
                     return;
                 }
 
                 if (data.code === 1001) {
-                    bail(new Error('Face not found. Try another photo.'));
+                    bail(new Error('Mukanya mana?'));
                     return;
                 }
 
                 if (data.code === -2100) { // request image is invalid
-                    bail(new Error('Try another photo.'));
+                    bail(new Error('Coba foto lain'));
                     return;
                 }
 
@@ -80,12 +99,12 @@ export const JadiAnime = async (img: string) => {
                     data.code === 2119 || // user_ip_country
                     data.code === -2111 // AUTH_FAILED
                 ) {
-                    bail(new Error("Blocked"));
+                    bail(new Error("Yaah fitur ini sedang tidak dapat digunakan"));
                     return;
                 }
 
                 if (!data.extra) {
-                    throw new Error('Got no data from QQ: ' + JSON.stringify(data));
+                    throw new Error('Gagal mengkonversi ' + JSON.stringify(data));
                 }
 
                 return JSON.parse(data.extra as string);
@@ -99,8 +118,8 @@ export const JadiAnime = async (img: string) => {
             },
         );
     } catch (e) {
-        console.error(`QQ file upload error caught: ${(e as Error).toString()}`);
-        throw new Error(`Unable to upload the photo: ${(e as Error).toString()}`);
+        console.error(`Konversi gagal: ${(e as Error).toString()}`);
+        throw new Error(`Konversi Gagal: ${(e as Error).toString()}`);
     }
 
     console.log(extra.img_urls[1] as string);
