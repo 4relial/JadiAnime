@@ -20,7 +20,7 @@ type opts = {
     proxyUrl ? : string;
   }
 
-export const JadiAnime = async (img: string, opts: opts) => {
+export const JadiAnime = async (img: string, opts?: opts) => {
 
     let httpsAgent: HttpsProxyAgent | SocksProxyAgent | undefined;
 
