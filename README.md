@@ -26,13 +26,13 @@ toAnime(__dirname + '/eula.jpg') // Path to your selfie
 ```
 
 ### Using Proxy
-Use a proxy from a country that is not banned like Indonesia, Japan, etc.
+You can use proxy option if QQ banned your region
+Proxy must from a country that is not banned like Indonesia, Japan, etc.
 ```js
 const { JadiAnime } = require('jadianime-ts')
 
 async function toAnime(path) {
     try {
-        // You can use proxy option if QQ banned your region
         let opts = {
             proxyType: "socks5", // https or socks5
             proxyUrl: "socks5://172.105.247.104:8080" // change to your proxy url
