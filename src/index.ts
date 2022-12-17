@@ -30,15 +30,14 @@ export const JadiAnime = async (img: string, opts?: opts) => {
     } else if(opts?.proxy?.toLowerCase().includes("https")){
         httpsAgent = new HttpsProxyAgent(opts.proxy);
         httpsAgent.timeout = 30000;
-    } else {
+    } else if (opts?.proxy){
         return { 
             code: 4041,
             error: "proxy error"
         }
     }
 
-    let qqmode = opts?.qqmode?.toLowerCase()
-
+    let qqmode = opts?.qqmode ? opts?.qqmode?.toLowerCase() : 'world'
     if(qqmode !== 'world' && qqmode !== 'china') return { 
         code: 4042,
         error: "QQ Mode not Found, use WORLD or CHINA only"
