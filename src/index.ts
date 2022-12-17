@@ -33,7 +33,7 @@ export const JadiAnime = async (img: string, opts?: opts) => {
     } else if (opts?.proxy){
         return { 
             code: 4041,
-            error: "proxy error"
+            error: "proxy error, use socks5 or https"
         }
     }
 
@@ -110,7 +110,7 @@ export const JadiAnime = async (img: string, opts?: opts) => {
                     data.code === 2119 || // user_ip_country
                     data.code === -2111 // AUTH_FAILED
                 ) {
-                    bail(new Error("Yaah fitur ini sedang tidak dapat digunakan"));
+                    bail(new Error("QQ block your region/ip"));
                     return;
                 }
 
@@ -134,8 +134,8 @@ export const JadiAnime = async (img: string, opts?: opts) => {
     }
     return {
         code : 200, 
-        img: extra.img_urls[1],
-        videoUrl: qqmode === 'china' ? (extra.video_urls[0]) : undefined,
-        singleImg: qqmode === 'china' ? (extra.img_urls[2]) : undefined, 
+        img: extra.img_urls[1] as string,
+        videoUrl: qqmode === 'china' ? (extra.video_urls[0] as string) : undefined,
+        singleImg: qqmode === 'china' ? (extra.img_urls[2] as string) : undefined, 
     }
 };
