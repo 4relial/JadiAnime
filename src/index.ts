@@ -16,25 +16,37 @@ const signV1 = (obj: Record<string, unknown>) => {
 };
 
 type opts = {
-    proxyType ? : string;
-    proxyUrl ? : string;
+    qqmode ? : string;
+    proxy ? : string;
   }
 
 export const JadiAnime = async (img: string, opts?: opts) => {
 
     let httpsAgent: HttpsProxyAgent | SocksProxyAgent | undefined;
 
-    if(opts?.proxyType?.toLowerCase() == "socks5"){
-        httpsAgent = new SocksProxyAgent(opts?.proxyUrl ? opts.proxyUrl : "");
+    if(opts?.proxy?.toLowerCase().includes("socks5")){
+        httpsAgent = new SocksProxyAgent(opts.proxy);
         httpsAgent.timeout = 30000;
-    } else if(opts?.proxyType?.toLowerCase() == "https"){
-        httpsAgent = new HttpsProxyAgent(opts?.proxyUrl ? opts.proxyUrl : "");
+    } else if(opts?.proxy?.toLowerCase().includes("https")){
+        httpsAgent = new HttpsProxyAgent(opts.proxy);
         httpsAgent.timeout = 30000;
+    } else {
+        return { 
+            code: 4041,
+            error: "proxy error"
+        }
+    }
+
+    let qqmode = opts?.qqmode?.toLowerCase()
+
+    if(qqmode !== 'world' && qqmode !== 'china') return { 
+        code: 4042,
+        error: "QQ Mode not Found, use WORLD or CHINA only"
     }
 
     const imgData = await base64(img)
     const obj = {
-        busiId: 'different_dimension_me_img_entry',
+        busiId:  qqmode === 'china' ? 'ai_painting_anime_entry' : 'different_dimension_me_img_entry',
         extra: JSON.stringify({
             face_rects: [],
             version: 2,
@@ -121,9 +133,10 @@ export const JadiAnime = async (img: string, opts?: opts) => {
         console.error(`Konversi gagal: ${(e as Error).toString()}`);
         throw new Error(`Konversi Gagal: ${(e as Error).toString()}`);
     }
-
-    console.log(extra.img_urls[1] as string);
     return {
-        img : extra.img_urls[1] as string
+        code : 200, 
+        img: extra.img_urls[1] as string,
+        videoUrl: qqmode === 'china' ? (extra.video_urls[0] as string) : undefined,
+        singleImg: qqmode === 'china' ? (extra.img_urls[2] as string) : undefined, 
     }
 };
