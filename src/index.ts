@@ -18,6 +18,7 @@ const signV1 = (obj: Record<string, unknown>) => {
 type opts = {
     qqmode ? : string;
     proxy ? : string;
+    style ? : string;
   }
 
 export const JadiAnime = async (img: string, opts?: opts) => {
@@ -43,9 +44,11 @@ export const JadiAnime = async (img: string, opts?: opts) => {
         error: "QQ Mode not Found, use WORLD or CHINA only"
     }
 
+    let style = opts?.style ? opts?.style?.toLowerCase() : 'ai_painting_anime_entry'
+
     const imgData = await base64(img)
     const obj = {
-        busiId:  qqmode === 'china' ? 'ai_painting_anime_entry' : 'different_dimension_me_img_entry',
+        busiId:  qqmode === 'china' ? style : 'different_dimension_me_img_entry',
         extra: JSON.stringify({
             face_rects: [],
             version: 2,
